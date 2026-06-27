@@ -1,33 +1,36 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
+# Ignore the reset-db.sql file inside resources
+/Blog Application Backend/src/main/resources/reset-db.sql
+
+# Backend ignores (adjusted paths)
+/Blog Application Backend/HELP.md
+/Blog Application Backend/target/
+/Blog Application Backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
-.env
+/Blog Application Backend/.env
 
 ### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+/Blog Application Backend/.apt_generated
+/Blog Application Backend/.classpath
+/Blog Application Backend/.factorypath
+/Blog Application Backend/.project
+/Blog Application Backend/.settings
+/Blog Application Backend/.springBeans
+/Blog Application Backend/.sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
 
 ### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
+/Blog Application Backend/nbproject/private/
+/Blog Application Backend/nbbuild/
+/Blog Application Backend/dist/
+/Blog Application Backend/nbdist/
+/Blog Application Backend/.nb-gradle/
+/Blog Application Backend/build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
