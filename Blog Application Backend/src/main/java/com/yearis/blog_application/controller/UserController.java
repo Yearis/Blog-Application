@@ -43,9 +43,9 @@ public class UserController {
     public ResponseEntity<String> updateUsername(
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
 
-        userService.updateUsername(userUpdateRequest);
+        String response = userService.updateUsername(userUpdateRequest);
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // update email
@@ -54,9 +54,9 @@ public class UserController {
     public ResponseEntity<String> updateEmail(
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
 
-        userService.updateEmail(userUpdateRequest);
+        String response = userService.updateEmail(userUpdateRequest);
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // update about
@@ -65,9 +65,9 @@ public class UserController {
     public ResponseEntity<String> updateAbout(
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
 
-        userService.updateAbout(userUpdateRequest);
+        String response = userService.updateAbout(userUpdateRequest);
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // update password
@@ -76,9 +76,9 @@ public class UserController {
     public ResponseEntity<String> updatePassword(
             @Valid @RequestBody PasswordChangeRequest passwordChangeRequest) {
 
-        userService.updatePassword(passwordChangeRequest);
+        String response = userService.updatePassword(passwordChangeRequest);
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /// --- Custom Methods ---

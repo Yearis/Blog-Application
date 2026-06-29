@@ -17,7 +17,5 @@ public class UserUpdateRequest {
 
     private String email;
 
-    private String password;
-
     private String about;
 }

@@ -39,7 +39,7 @@ public class User {
 
     @NotBlank(message = "Password is required")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}.*$",
-             message = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character.")
+            message = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character.")
     @Column(name = "password", nullable = false)
     private String password;
 

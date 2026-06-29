@@ -2,7 +2,6 @@ package com.yearis.blog_application.service;
 
 import com.yearis.blog_application.payload.request.CommentRequest;
 import com.yearis.blog_application.payload.response.CommentResponse;
-import com.yearis.blog_application.payload.response.PostResponse;
 
 import java.util.List;
 
