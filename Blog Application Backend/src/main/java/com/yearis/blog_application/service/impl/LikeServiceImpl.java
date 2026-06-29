@@ -96,7 +96,7 @@ public class LikeServiceImpl implements LikeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "comment Id", commentId));
 
         // we check if our comment exists in the post or not
-        if (!likedComment.getPost().getId().equals(postId)) {
+        if (!likedComment.getPost().getId().equals(post.getId())) {
 
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
         }

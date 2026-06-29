@@ -105,18 +105,21 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostResponse createPost(PostRequest postRequest) {
 
+        User currentUser = currentUser();
+
         // we map our request DTO to our entity from the request that was received
         Post post = mapToEntity(postRequest);
 
         // now we link the user to the post
-        post.setAuthor(currentUser());
+        post.setAuthor(currentUser);
 
         // we save our post to database
         Post newPost = postRepository.save(post);
 
         Like firstLike = new Like();
-        firstLike.setUser(currentUser());
+        firstLike.setUser(currentUser);
         firstLike.setPost(newPost);
+
         // and we don't set the comment as this like is only for post
 
         likeRepository.save(firstLike);

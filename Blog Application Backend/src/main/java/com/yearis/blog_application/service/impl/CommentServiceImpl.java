@@ -113,6 +113,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentResponse createComment(Long postId, CommentRequest commentRequest) {
 
+        User currentUser = currentUser();
+
         // 1st, we map our DTO to our entity
         Comment comment = mapToEntity(commentRequest);
 
@@ -122,7 +124,7 @@ public class CommentServiceImpl implements CommentService {
 
         // now we link our comment to a post then to current user
         comment.setPost(post);
-        comment.setAuthor(currentUser());
+        comment.setAuthor(currentUser);
 
         // now we check if our comment has a parent or not
         // if it has a parent
@@ -130,7 +132,7 @@ public class CommentServiceImpl implements CommentService {
 
             // 1st, we check if that parent exists or not
             Comment parent = commentRepository.findById(commentRequest.getParentId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Comment", "comment Id", commentRequest.getParentId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Comment", "comment Id", commentRequest.getParentId()));
 
             // does our parent comment belong to the same post
             if (!parent.getPost().getId().equals(postId)) {
@@ -144,7 +146,7 @@ public class CommentServiceImpl implements CommentService {
         Comment newComment = commentRepository.save(comment);
 
         Like firstLike = new Like();
-        firstLike.setUser(currentUser());
+        firstLike.setUser(currentUser);
         firstLike.setComment(newComment);
         // and we don't set the post as this like is only for comment
 
@@ -166,7 +168,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                             .orElseThrow(() -> new ResourceNotFoundException("Comment", "comment Id", commentId));
 
-        if (!comment.getPost().getId().equals(postId)) {
+        if (!comment.getPost().getId().equals(post.getId())) {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
         }
 
@@ -227,7 +229,7 @@ public class CommentServiceImpl implements CommentService {
                             .orElseThrow(() -> new ResourceNotFoundException("Comment", "comment Id", commentId));
 
         // does our parent comment belong to the same post
-        if (!comment.getPost().getId().equals(postId)) {
+        if (!comment.getPost().getId().equals(post.getId())) {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
         }
 
