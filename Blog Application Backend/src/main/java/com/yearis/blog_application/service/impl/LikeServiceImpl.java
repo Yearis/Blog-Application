@@ -4,14 +4,13 @@ import com.yearis.blog_application.entity.Comment;
 import com.yearis.blog_application.entity.Like;
 import com.yearis.blog_application.entity.Post;
 import com.yearis.blog_application.entity.User;
-import com.yearis.blog_application.exception.BlogAPIException;
+import com.yearis.blog_application.exception.BadRequestException;
 import com.yearis.blog_application.exception.ResourceNotFoundException;
 import com.yearis.blog_application.repository.CommentRepository;
 import com.yearis.blog_application.repository.LikeRepository;
 import com.yearis.blog_application.repository.PostRepository;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.service.LikeService;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -98,7 +97,7 @@ public class LikeServiceImpl implements LikeService {
         // we check if our comment exists in the post or not
         if (!likedComment.getPost().getId().equals(post.getId())) {
 
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
+            throw new BadRequestException("Comment doesn't belong to the post");
         }
 
         // now we check if the comment has been already liked by the user or not

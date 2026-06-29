@@ -2,6 +2,7 @@ package com.yearis.blog_application.service.impl;
 
 import com.yearis.blog_application.entity.Role;
 import com.yearis.blog_application.entity.User;
+import com.yearis.blog_application.exception.ResourceConflictException;
 import com.yearis.blog_application.payload.request.LoginRequest;
 import com.yearis.blog_application.payload.request.RegisterRequest;
 import com.yearis.blog_application.payload.response.JwtAuthResponse;
@@ -55,13 +56,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public String register(RegisterRequest request) throws Exception {
+    public String register(RegisterRequest request) {
 
         // first we check if the username or password is already used or not
         if (userRepository.existsByEmail(request.getEmail()) ||
                 userRepository.existsByUsername(request.getUsername())) {
 
-            throw new Exception("Username or email already taken");
+            throw new ResourceConflictException("Username or email already taken");
         }
 
         User user = buildUser(request);

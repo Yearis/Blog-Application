@@ -1,4 +1,4 @@
-package com.yearis.blog_application.payload.response;
+package com.yearis.blog_application.exception.response;
 
 import lombok.*;
 
@@ -15,5 +15,4 @@ public class ErrorResponse {
     private String details;
     private LocalDateTime timeStamp;
     private String message;
-
 }

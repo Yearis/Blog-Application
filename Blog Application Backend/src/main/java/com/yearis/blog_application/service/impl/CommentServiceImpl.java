@@ -4,8 +4,9 @@ import com.yearis.blog_application.entity.Comment;
 import com.yearis.blog_application.entity.Like;
 import com.yearis.blog_application.entity.Post;
 import com.yearis.blog_application.entity.User;
-import com.yearis.blog_application.exception.BlogAPIException;
+import com.yearis.blog_application.exception.BadRequestException;
 import com.yearis.blog_application.exception.ResourceNotFoundException;
+import com.yearis.blog_application.exception.UnAuthenticatedException;
 import com.yearis.blog_application.payload.request.CommentRequest;
 import com.yearis.blog_application.payload.response.CommentResponse;
 import com.yearis.blog_application.repository.CommentRepository;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -136,7 +136,7 @@ public class CommentServiceImpl implements CommentService {
 
             // does our parent comment belong to the same post
             if (!parent.getPost().getId().equals(postId)) {
-                throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
+                throw new BadRequestException("Comment doesn't belong to the post");
             }
 
             comment.setParent(parent);
@@ -169,7 +169,7 @@ public class CommentServiceImpl implements CommentService {
                             .orElseThrow(() -> new ResourceNotFoundException("Comment", "comment Id", commentId));
 
         if (!comment.getPost().getId().equals(post.getId())) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
+            throw new BadRequestException("Comment doesn't belong to the post");
         }
 
         return mapToResponse(comment);
@@ -200,7 +200,7 @@ public class CommentServiceImpl implements CommentService {
 
         // 2. SAFETY CHECK: Does this parent comment belong to the URL's post?
         if (!parentComment.getPost().getId().equals(postId)) {
-                throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment does not belong to this post");
+                throw new BadRequestException("Comment does not belong to this post");
         }
 
         Sort sort = Sort.by("createdDate").ascending();
@@ -230,7 +230,7 @@ public class CommentServiceImpl implements CommentService {
 
         // does our parent comment belong to the same post
         if (!comment.getPost().getId().equals(post.getId())) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
+            throw new BadRequestException("Comment doesn't belong to the post");
         }
 
         // now we check that does user even has authority to update comment
@@ -240,7 +240,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (!currentUser.equals(owner)) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized Access!");
+            throw new UnAuthenticatedException("Unauthorized Access!");
         }
 
         // if everything is fine we allow the update
@@ -268,7 +268,7 @@ public class CommentServiceImpl implements CommentService {
 
         // does our parent comment belong to the same post
         if (!comment.getPost().getId().equals(postId)) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment doesn't belong to the post");
+            throw new BadRequestException("Comment doesn't belong to the post");
         }
 
         User currentUser = currentUser();
@@ -282,7 +282,7 @@ public class CommentServiceImpl implements CommentService {
         // as an admin should be allowed to delete inappropriate posts
         if (!isCommentOwner && !isPostOwner && !isAdmin) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized Access!");
+            throw new UnAuthenticatedException("Unauthorized Access!");
         }
 
         // now we need it so that when parent comment is deleted it doesn't collapse the replies
@@ -322,7 +322,7 @@ public class CommentServiceImpl implements CommentService {
         // as comments are not public but private
         if (!currentUser.getId().equals(userId)) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            throw new UnAuthenticatedException("Unauthorized access");
         }
 
         // sorting and breaking the comments into pages
@@ -348,7 +348,7 @@ public class CommentServiceImpl implements CommentService {
         // here we check if our current user's id is same as what's being passed in the methods
         if (!currentUser.getId().equals(userId)) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            throw new UnAuthenticatedException("Unauthorized access");
         }
 
         // sorting and breaking the comments into pages

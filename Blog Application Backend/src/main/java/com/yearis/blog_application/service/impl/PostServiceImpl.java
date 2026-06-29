@@ -3,8 +3,8 @@ package com.yearis.blog_application.service.impl;
 import com.yearis.blog_application.entity.Like;
 import com.yearis.blog_application.entity.Post;
 import com.yearis.blog_application.entity.User;
-import com.yearis.blog_application.exception.BlogAPIException;
 import com.yearis.blog_application.exception.ResourceNotFoundException;
+import com.yearis.blog_application.exception.UnAuthenticatedException;
 import com.yearis.blog_application.payload.request.PostRequest;
 import com.yearis.blog_application.payload.response.PostResponse;
 import com.yearis.blog_application.repository.CommentRepository;
@@ -12,7 +12,6 @@ import com.yearis.blog_application.repository.LikeRepository;
 import com.yearis.blog_application.repository.PostRepository;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.service.PostService;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -195,7 +194,7 @@ public class PostServiceImpl implements PostService {
 
         if (!currentUser.equals(owner)) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized Access!");
+            throw new UnAuthenticatedException("Unauthorized Access!");
         }
 
         // we only allow the change for title n content
@@ -230,7 +229,7 @@ public class PostServiceImpl implements PostService {
         // as an admin should be allowed to delete inappropriate posts
         if (!isOwner && !isAdmin) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized Access!");
+            throw new UnAuthenticatedException("Unauthorized Access!");
         }
 
         // now we need it so that when post is deleted it doesn't collapse the comments
@@ -286,7 +285,7 @@ public class PostServiceImpl implements PostService {
         // here we check if our current user's id is same as what's being passed in the methods
         if (!currentUser.getId().equals(userId)) {
 
-            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            throw new UnAuthenticatedException("Unauthorized access");
         }
 
         // sorting and breaking the posts into pages
