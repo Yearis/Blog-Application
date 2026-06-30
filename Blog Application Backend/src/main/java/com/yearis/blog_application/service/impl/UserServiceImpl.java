@@ -2,12 +2,14 @@ package com.yearis.blog_application.service.impl;
 
 import com.yearis.blog_application.entity.User;
 import com.yearis.blog_application.exception.*;
+import com.yearis.blog_application.mappers.UserMapper;
 import com.yearis.blog_application.payload.request.PasswordChangeRequest;
 import com.yearis.blog_application.payload.request.UserUpdateRequest;
 import com.yearis.blog_application.payload.response.UserProfileResponse;
 import com.yearis.blog_application.payload.response.UserUpdateResponse;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,15 +21,12 @@ import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UserMapper userMapper;
 
     // get our current user
     private User currentUser() {
@@ -104,17 +103,9 @@ public class UserServiceImpl implements UserService {
             currentUser.setAbout(userUpdateRequest.getAbout());
         }
 
-        userRepository.save(currentUser);
+        User newUser = userRepository.save(currentUser);
 
-        // send response
-        UserUpdateResponse userUpdateResponse = new UserUpdateResponse();
-        userUpdateResponse.setId(currentUser.getId());
-        userUpdateResponse.setUsername(currentUser.getUsername());
-        userUpdateResponse.setEmail(currentUser.getEmail());
-        userUpdateResponse.setAbout(currentUser.getAbout());
-        userUpdateResponse.setJoinedDate(currentUser.getJoinedDate());
-
-        return userUpdateResponse;
+        return userMapper.mapToUpdateResponse(newUser);
     }
 
     @Override
@@ -158,14 +149,8 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findByUsernameContaining(username);
 
         return users.stream()
-                .map(user -> {
-                    UserProfileResponse response = new UserProfileResponse();
-                    response.setId(user.getId());
-                    response.setUsername(user.getUsername());
-                    response.setAbout(user.getAbout());
-                    response.setJoinedDate(user.getJoinedDate());
-                    return response;
-                }).toList();
+                .map(userMapper::mapToProfileResponse)
+                .toList();
     }
 
     @Override
@@ -175,13 +160,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
-        UserProfileResponse response = new UserProfileResponse();
-        response.setId(user.getId());
-        response.setUsername(user.getUsername());
-        response.setAbout(user.getAbout());
-        response.setJoinedDate(user.getJoinedDate());
-
-        return response;
+        return userMapper.mapToProfileResponse(user);
     }
 
 }

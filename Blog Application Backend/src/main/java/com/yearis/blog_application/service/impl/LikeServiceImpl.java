@@ -11,6 +11,7 @@ import com.yearis.blog_application.repository.LikeRepository;
 import com.yearis.blog_application.repository.PostRepository;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.service.LikeService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,19 +21,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Transactional(readOnly = true)
+@AllArgsConstructor
 public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-
-    public LikeServiceImpl(LikeRepository likeRepository, UserRepository userRepository, PostRepository postRepository, CommentRepository commentRepository) {
-        this.likeRepository = likeRepository;
-        this.userRepository = userRepository;
-        this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
-    }
 
     // to get our current user
     private User currentUser() {

@@ -3,6 +3,7 @@ package com.yearis.blog_application.service.impl;
 import com.yearis.blog_application.entity.Role;
 import com.yearis.blog_application.entity.User;
 import com.yearis.blog_application.exception.ResourceConflictException;
+import com.yearis.blog_application.mappers.UserMapper;
 import com.yearis.blog_application.payload.request.LoginRequest;
 import com.yearis.blog_application.payload.request.RegisterRequest;
 import com.yearis.blog_application.payload.response.JwtAuthResponse;
@@ -10,6 +11,7 @@ import com.yearis.blog_application.repository.RoleRepository;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.security.JwtService;
 import com.yearis.blog_application.service.AuthService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,7 @@ import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -30,29 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final RoleRepository roleRepository;
     private final JwtService jwtService;
-
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, RoleRepository roleRepository, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.roleRepository = roleRepository;
-        this.jwtService = jwtService;
-    }
-
-    private User buildUser(RegisterRequest request) {
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Error: Role not found"));
-
-        user.setRoles(Set.of(userRole));
-
-        return user;
-    }
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -65,7 +46,15 @@ public class AuthServiceImpl implements AuthService {
             throw new ResourceConflictException("Username or email already taken");
         }
 
-        User user = buildUser(request);
+        // this will successfully create the user fields like username, email and pw to entity
+        User user = userMapper.mapToEntity(request);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Error: Role not found"));
+
+        user.setRoles(Set.of(userRole));
 
         userRepository.save(user);
 

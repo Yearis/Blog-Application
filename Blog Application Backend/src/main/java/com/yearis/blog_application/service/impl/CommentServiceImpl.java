@@ -7,6 +7,7 @@ import com.yearis.blog_application.entity.User;
 import com.yearis.blog_application.exception.BadRequestException;
 import com.yearis.blog_application.exception.ResourceNotFoundException;
 import com.yearis.blog_application.exception.UnAuthenticatedException;
+import com.yearis.blog_application.mappers.CommentMapper;
 import com.yearis.blog_application.payload.request.CommentRequest;
 import com.yearis.blog_application.payload.response.CommentResponse;
 import com.yearis.blog_application.repository.CommentRepository;
@@ -14,6 +15,7 @@ import com.yearis.blog_application.repository.LikeRepository;
 import com.yearis.blog_application.repository.PostRepository;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.service.CommentService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,19 +31,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@AllArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
-
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
-        this.commentRepository = commentRepository;
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.likeRepository = likeRepository;
-    }
+    private final CommentMapper commentMapper;
 
     // get our current user
     private User currentUser() {
@@ -54,56 +51,56 @@ public class CommentServiceImpl implements CommentService {
 
     /// --- Mappers ---
 
-    // Converts Entity -> Response DTO
-    private CommentResponse mapToResponse(Comment comment) {
-
-        CommentResponse response = new CommentResponse();
-
-        // we manually map Comment to CommentDTO
-        response.setId(comment.getId());
-        response.setBody(comment.getBody());
-        response.setCreatedDate(comment.getCreatedDate());
-        response.setEdited(comment.isEdited());
-        response.setLikes(comment.getLikes());
-
-        // post info
-        response.setPostId(comment.getPost().getId());
-
-        // we also give frontend parent ID for the comment if it exists
-        if (comment.getParent() != null) {
-            // if comment has a parent meaning its not root comment
-            response.setParentId(comment.getParent().getId());
-        }
-
-        // handling author info
-        if (comment.getAuthor() != null) {
-            response.setAuthorId(comment.getAuthor().getId());
-            response.setAuthorName(comment.getAuthor().getUsername());
-        } else {
-
-            response.setAuthorId(null);
-
-            // Check body to decide label
-            if ("[deleted by user]".equals(comment.getBody()) || "[removed by admin]".equals(comment.getBody())) {
-                response.setAuthorName("[removed]"); // User deleted the comment
-            } else {
-                response.setAuthorName("[deleted]"); // User deleted their account
-            }
-        }
-
-        return response;
-    }
-
-    // Convert Request DTO -> Entity
-    private Comment mapToEntity(CommentRequest request) {
-
-        Comment comment = new Comment();
-
-        // we manually map CommentDTO to Comment
-        comment.setBody(request.getBody());
-
-        return comment;
-    }
+//    // Converts Entity -> Response DTO
+//    private CommentResponse mapToResponse(Comment comment) {
+//
+//        CommentResponse response = new CommentResponse();
+//
+//        // we manually map Comment to CommentDTO
+//        response.setId(comment.getId());
+//        response.setBody(comment.getBody());
+//        response.setCreatedDate(comment.getCreatedDate());
+//        response.setEdited(comment.isEdited());
+//        response.setLikes(comment.getLikes());
+//
+//        // post info
+//        response.setPostId(comment.getPost().getId());
+//
+//        // we also give frontend parent ID for the comment if it exists
+//        if (comment.getParent() != null) {
+//            // if comment has a parent meaning its not root comment
+//            response.setParentId(comment.getParent().getId());
+//        }
+//
+//        // handling author info
+//        if (comment.getAuthor() != null) {
+//            response.setAuthorId(comment.getAuthor().getId());
+//            response.setAuthorName(comment.getAuthor().getUsername());
+//        } else {
+//
+//            response.setAuthorId(null);
+//
+//            // Check body to decide label
+//            if ("[deleted by user]".equals(comment.getBody()) || "[removed by admin]".equals(comment.getBody())) {
+//                response.setAuthorName("[removed]"); // User deleted the comment
+//            } else {
+//                response.setAuthorName("[deleted]"); // User deleted their account
+//            }
+//        }
+//
+//        return response;
+//    }
+//
+//    // Convert Request DTO -> Entity
+//    private Comment mapToEntity(CommentRequest request) {
+//
+//        Comment comment = new Comment();
+//
+//        // we manually map CommentDTO to Comment
+//        comment.setBody(request.getBody());
+//
+//        return comment;
+//    }
 
     /// --- CRUD Operations ---
 
@@ -116,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
         User currentUser = currentUser();
 
         // 1st, we map our DTO to our entity
-        Comment comment = mapToEntity(commentRequest);
+        Comment comment = commentMapper.mapToEntity(commentRequest);
 
         // our comment doesn't have a post, so we use post repository to get the post if it doesn't exist, we throw an error
         Post post = postRepository.findById(postId)
@@ -152,7 +149,7 @@ public class CommentServiceImpl implements CommentService {
 
         likeRepository.save(firstLike);
 
-        return mapToResponse(newComment);
+        return commentMapper.mapToResponse(newComment);
     }
 
     /// R: Read/Find/Get
@@ -172,7 +169,7 @@ public class CommentServiceImpl implements CommentService {
             throw new BadRequestException("Comment doesn't belong to the post");
         }
 
-        return mapToResponse(comment);
+        return commentMapper.mapToResponse(comment);
     }
 
     @Override
@@ -186,7 +183,7 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> comments = commentRepository.findByPostIdAndParentIdIsNull(postId, pageable);
 
         return comments.stream()
-                .map(comment -> mapToResponse(comment))
+                .map(commentMapper::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -210,7 +207,7 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> comments = commentRepository.findByParentId(commentId, pageable);
 
         return comments.stream()
-                .map(comment -> mapToResponse(comment))
+                .map(commentMapper::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -249,7 +246,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment updatedComment = commentRepository.save(comment);
 
-        return mapToResponse(updatedComment);
+        return commentMapper.mapToResponse(updatedComment);
     }
 
     /// D: Delete
@@ -334,7 +331,7 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> userComments = commentRepository.findByAuthorId(userId, pageable);
 
         return userComments.stream()
-                .map(comment -> mapToResponse(comment))
+                .map(commentMapper::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -359,7 +356,7 @@ public class CommentServiceImpl implements CommentService {
         Page<Like> likedComments = likeRepository.findByUserIdAndCommentIsNotNull(userId, pageable);
 
         return likedComments.stream()
-                .map(like -> mapToResponse(like.getComment()))
+                .map(like -> commentMapper.mapToResponse(like.getComment()))
                 .collect(Collectors.toList());
     }
 }
