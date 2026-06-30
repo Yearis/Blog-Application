@@ -1,7 +1,7 @@
 package com.yearis.blog_application.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,8 @@ public class PasswordChangeRequest {
     private String currentPassword;
 
     @NotBlank(message = "This field cannot be blank")
-    @Size(min = 8, max = 30, message = "Password must be at least 8 characters")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}.*$",
+            message = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character.")
     private String newPassword;
 
     @NotBlank(message = "This field cannot be blank")

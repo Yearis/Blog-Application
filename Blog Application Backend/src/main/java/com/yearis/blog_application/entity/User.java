@@ -1,10 +1,6 @@
 package com.yearis.blog_application.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -27,19 +23,12 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank(message = "Username cannot be empty")
-    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     @Column(name = "username", unique = true, length = 20)
     private String username;
 
-    @NotBlank(message = "Email field cannot be empty")
-    @Email
     @Column(name = "email", unique = true)
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}.*$",
-            message = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one special character.")
     @Column(name = "password", nullable = false)
     private String password;
 

@@ -1,8 +1,6 @@
 package com.yearis.blog_application.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -24,13 +22,9 @@ public class Post {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank(message = "Title cannot be empty")
-    @Size(min = 10, max = 50, message = "Title must be between 10 and 50 characters")
     @Column(name = "title", nullable = false, length = 50)
     private String title;
 
-    @NotBlank(message = "Content cannot be empty")
-    @Size(min = 20, max = 5000)
     @Column(name = "content", columnDefinition = "TEXT") // allows long content
     private String content;
 

@@ -1,9 +1,7 @@
 package com.yearis.blog_application.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,8 +24,6 @@ public class Comment {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank(message = "Comment cannot be empty")
-    @Size(min = 2, max = 1000, message = "Comment must be less than 1000 characters")
     @Column(name = "body", columnDefinition = "TEXT")
     private String body;
 
