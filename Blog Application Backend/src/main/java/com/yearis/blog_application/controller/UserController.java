@@ -5,6 +5,7 @@ import com.yearis.blog_application.payload.request.UserUpdateRequest;
 import com.yearis.blog_application.payload.response.CommentResponse;
 import com.yearis.blog_application.payload.response.PostResponse;
 import com.yearis.blog_application.payload.response.UserProfileResponse;
+import com.yearis.blog_application.payload.response.UserUpdateResponse;
 import com.yearis.blog_application.service.CommentService;
 import com.yearis.blog_application.service.PostService;
 import com.yearis.blog_application.service.UserService;
@@ -37,35 +38,13 @@ public class UserController {
 
     /// U: Update
 
-    // update username
-    @Operation(summary = "Update username", description = "Update username of an existing user")
-    @PutMapping("/username")
-    public ResponseEntity<String> updateUsername(
+    // update user profile
+    @Operation(summary = "Update user profile", description = "Update either username/email/about or all of current user")
+    @PatchMapping("/profile")
+    public ResponseEntity<UserUpdateResponse> updateUserProfile(
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
 
-        String response = userService.updateUsername(userUpdateRequest);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    // update email
-    @Operation(summary = "Update email", description = "Update email of an existing user")
-    @PutMapping("/email")
-    public ResponseEntity<String> updateEmail(
-            @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-
-        String response = userService.updateEmail(userUpdateRequest);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    // update about
-    @Operation(summary = "Update about section", description = "Update the about/bio section of the current user")
-    @PutMapping("/about")
-    public ResponseEntity<String> updateAbout(
-            @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-
-        String response = userService.updateAbout(userUpdateRequest);
+        UserUpdateResponse response = userService.updateUserProfile(userUpdateRequest);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

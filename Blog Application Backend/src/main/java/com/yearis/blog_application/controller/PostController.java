@@ -1,6 +1,7 @@
 package com.yearis.blog_application.controller;
 
 import com.yearis.blog_application.payload.request.PostRequest;
+import com.yearis.blog_application.payload.request.PostUpdateRequest;
 import com.yearis.blog_application.payload.response.PostResponse;
 import com.yearis.blog_application.service.LikeService;
 import com.yearis.blog_application.service.PostService;
@@ -91,12 +92,12 @@ public class PostController {
 
     // update a post title/content (ig we would need 2 methods)
     @Operation(summary = "Update a post", description = "Update the details of an existing post")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<PostResponse> updatePost(
-            @Parameter(description = "payload for the updated post") @Valid @RequestBody PostRequest postRequest,
+            @Parameter(description = "payload for the updated post") @Valid @RequestBody PostUpdateRequest postUpdateRequest,
             @Parameter(description = "ID of the post to update") @PathVariable Long id) {
 
-        PostResponse updatedPost = postService.updatePost(postRequest, id);
+        PostResponse updatedPost = postService.updatePost(postUpdateRequest, id);
 
         return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }

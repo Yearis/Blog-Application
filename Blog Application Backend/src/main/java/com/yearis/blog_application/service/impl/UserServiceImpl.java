@@ -5,6 +5,7 @@ import com.yearis.blog_application.exception.*;
 import com.yearis.blog_application.payload.request.PasswordChangeRequest;
 import com.yearis.blog_application.payload.request.UserUpdateRequest;
 import com.yearis.blog_application.payload.response.UserProfileResponse;
+import com.yearis.blog_application.payload.response.UserUpdateResponse;
 import com.yearis.blog_application.repository.UserRepository;
 import com.yearis.blog_application.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,91 +40,81 @@ public class UserServiceImpl implements UserService {
 
     /// U: Update
 
-    // update username
+    // update user profile
     @Override
     @Transactional
-    public String updateUsername(UserUpdateRequest userUpdateRequest) {
-
-        if (userUpdateRequest.getUsername() == null || userUpdateRequest.getUsername().trim().isEmpty()) {
-
-            throw new BadRequestException("Username cannot be empty");
-        }
+    public UserUpdateResponse updateUserProfile(UserUpdateRequest userUpdateRequest) {
 
         // first we make sure the user whose details have to be updated exists or not
         // and current user always exists
         User currentUser = currentUser();
 
-        // new username shouldn't be his current username
-        if (currentUser.getUsername().equals(userUpdateRequest.getUsername())) {
+        // update username
+        if (userUpdateRequest.getUsername() != null) {
 
-            throw new BadRequestException("New username cannot be same as your current username");
+            // in case user tries to submit blank username field
+            if (userUpdateRequest.getUsername().trim().isEmpty()) {
+
+                throw new BadRequestException("Username cannot be empty");
+            }
+
+            // new username shouldn't be his current username
+            if (currentUser.getUsername().equals(userUpdateRequest.getUsername())) {
+
+                throw new BadRequestException("New username cannot be same as your current username");
+            }
+
+            // now we check if the user's new name already exists or not
+            if (userRepository.existsByUsername(userUpdateRequest.getUsername())) {
+
+                throw new BadRequestException("Username already exists.\nTry another name");
+            }
+
+            // now we set the name
+            currentUser.setUsername(userUpdateRequest.getUsername());
         }
 
-        // now we check if the user's new name already exists or not
-        if (userRepository.existsByUsername(userUpdateRequest.getUsername())) {
+        // update email
+        if (userUpdateRequest.getEmail() != null) {
+            if (userUpdateRequest.getEmail().trim().isEmpty()) {
 
-            throw new BadRequestException("Username already exists.\nTry another name");
+                throw new BadRequestException("Email cannot be empty");
+            }
+
+            // new email shouldn't be his current email
+            if (currentUser.getEmail().equals(userUpdateRequest.getEmail())) {
+
+                throw new BadRequestException("New email cannot be same as your current email");
+            }
+
+            // now we check if the user's new email already used or not
+            if (userRepository.existsByEmail(userUpdateRequest.getEmail())) {
+
+                throw new BadRequestException("Email already user.\nTry another email");
+            }
+
+            // now we set the name
+            currentUser.setEmail(userUpdateRequest.getEmail());
         }
 
-        // now we set the name
-        currentUser.setUsername(userUpdateRequest.getUsername());
+        // update about
+        if (userUpdateRequest.getAbout() != null) {
 
-        // now we save the user
+            // now we set the about
+            currentUser.setAbout(userUpdateRequest.getAbout());
+        }
+
         userRepository.save(currentUser);
 
-        return "Username updated!";
-    }
+        // send response
+        UserUpdateResponse userUpdateResponse = new UserUpdateResponse();
+        userUpdateResponse.setId(currentUser.getId());
+        userUpdateResponse.setUsername(currentUser.getUsername());
+        userUpdateResponse.setEmail(currentUser.getEmail());
+        userUpdateResponse.setAbout(currentUser.getAbout());
+        userUpdateResponse.setJoinedDate(currentUser.getJoinedDate());
 
-    @Override
-    @Transactional
-    public String updateEmail(UserUpdateRequest userUpdateRequest) {
-
-        if (userUpdateRequest.getEmail() == null || userUpdateRequest.getEmail().trim().isEmpty()) {
-
-            throw new BadRequestException("Email cannot be empty");
-        }
-
-        // same as updating username
-        User currentUser = currentUser();
-
-        // new email shouldn't be his current email
-        if (currentUser.getEmail().equals(userUpdateRequest.getEmail())) {
-
-            throw new BadRequestException("New email cannot be same as your current email");
-        }
-
-        // now we check if the user's new email already used or not
-        if (userRepository.existsByEmail(userUpdateRequest.getEmail())) {
-
-            throw new BadRequestException("Email already user.\nTry another email");
-        }
-
-        // now we set the name
-        currentUser.setEmail(userUpdateRequest.getEmail());
-
-        // now we save the user
-        userRepository.save(currentUser);
-
-        return "Email updated!";
-    }
-
-    @Override
-    @Transactional
-    public String updateAbout(UserUpdateRequest userUpdateRequest) {
-
-        if (userUpdateRequest.getAbout() == null) {
-            throw new BadRequestException("About section cannot be null");
-        }
-
-        User currentUser = currentUser();
-
-        // now we set the about
-        currentUser.setAbout(userUpdateRequest.getAbout());
-
-        // now we can save the user
-        userRepository.save(currentUser);
-
-        return "About section updated";
+        return userUpdateResponse;
     }
 
     @Override

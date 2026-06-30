@@ -1,6 +1,7 @@
 package com.yearis.blog_application.service;
 
 import com.yearis.blog_application.payload.request.PostRequest;
+import com.yearis.blog_application.payload.request.PostUpdateRequest;
 import com.yearis.blog_application.payload.response.PostResponse;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface PostService {
     List<PostResponse> findAllPosts(int pageNo, int pageSize);
 
     /// U: Update
-    PostResponse updatePost(PostRequest postRequest, Long id);
+    PostResponse updatePost(PostUpdateRequest postUpdateRequest, Long id);
 
     /// D: Delete
     void deletePost(Long id);

@@ -1,5 +1,6 @@
 # Ignore the reset-db.sql file inside resources
 /Blog Application Backend/src/main/resources/reset-db.sql
+/code_review_report.md
 
 # Backend ignores (adjusted paths)
 /Blog Application Backend/HELP.md
@@ -8,6 +9,7 @@
 !**/src/main/**/target/
 !**/src/test/**/target/
 /Blog Application Backend/.env
+/Blog Application Backend/src/test/
 
 ### STS ###
 /Blog Application Backend/.apt_generated

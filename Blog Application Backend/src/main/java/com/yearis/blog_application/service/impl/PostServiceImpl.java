@@ -3,9 +3,11 @@ package com.yearis.blog_application.service.impl;
 import com.yearis.blog_application.entity.Like;
 import com.yearis.blog_application.entity.Post;
 import com.yearis.blog_application.entity.User;
+import com.yearis.blog_application.exception.BadRequestException;
 import com.yearis.blog_application.exception.ResourceNotFoundException;
 import com.yearis.blog_application.exception.UnAuthenticatedException;
 import com.yearis.blog_application.payload.request.PostRequest;
+import com.yearis.blog_application.payload.request.PostUpdateRequest;
 import com.yearis.blog_application.payload.response.PostResponse;
 import com.yearis.blog_application.repository.CommentRepository;
 import com.yearis.blog_application.repository.LikeRepository;
@@ -180,7 +182,7 @@ public class PostServiceImpl implements PostService {
     // update an already existing post
     @Override
     @Transactional
-    public PostResponse updatePost(PostRequest postRequest, Long id) {
+    public PostResponse updatePost(PostUpdateRequest postUpdateRequest, Long id) {
 
         // here a new DTO has been sent with the updated info, so we just update that in our og post
         // we find the post if it doesn't exist, we throw an error
@@ -197,9 +199,26 @@ public class PostServiceImpl implements PostService {
             throw new UnAuthenticatedException("Unauthorized Access!");
         }
 
-        // we only allow the change for title n content
-        post.setTitle(postRequest.getTitle());
-        post.setContent(postRequest.getContent());
+        if (postUpdateRequest.getTitle() != null) {
+
+            if (postUpdateRequest.getTitle().trim().isEmpty()) {
+
+                throw new BadRequestException("Post title cannot be empty");
+            }
+
+            post.setTitle(postUpdateRequest.getTitle());
+        }
+
+        if (postUpdateRequest.getContent() != null) {
+
+            if (postUpdateRequest.getContent().trim().isEmpty()) {
+
+                throw new BadRequestException("Post content cannot be empty");
+            }
+
+            post.setContent(postUpdateRequest.getContent());
+        }
+
         post.setEdited(true);
 
         // save/update the new post
